@@ -1,0 +1,61 @@
+{
+  "name": "@spindlecommerce/storefront-react",
+  "version": "0.1.0",
+  "description": "React bindings for SpindleCommerce storefronts: render page-builder content and pick variants.",
+  "keywords": [
+    "spindlecommerce",
+    "storefront"
+  ],
+  "homepage": "https://github.com/spindlecommerce/storefront-sdk/tree/main/packages/storefront-react#readme",
+  "bugs": "https://github.com/spindlecommerce/storefront-sdk/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spindlecommerce/storefront-sdk.git",
+    "directory": "packages/storefront-react"
+  },
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "source": "./src/client.ts",
+      "types": "./dist/client.d.ts",
+      "default": "./dist/client.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./client": {
+        "types": "./dist/client.d.ts",
+        "default": "./dist/client.js"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@spindlecommerce/storefront-client": "workspace:^"
+  },
+  "peerDependencies": {
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.3.0",
+    "react": "19.3.1"
+  }
+}

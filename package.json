@@ -1,0 +1,24 @@
+{
+  "name": "storefront-sdk",
+  "private": true,
+  "type": "module",
+  "license": "MIT",
+  "engines": {
+    "node": ">=24.12"
+  },
+  "packageManager": "pnpm@11.13.1",
+  "scripts": {
+    "build": "pnpm -r build",
+    "typecheck": "pnpm -r typecheck && tsc",
+    "test": "vitest run",
+    "changeset": "changeset",
+    "schema:pull": "curl -fsSL https://raw.githubusercontent.com/spindlecommerce/spindlecommerce/main/schema/storefront.graphql -o schema/storefront.graphql"
+  },
+  "devDependencies": {
+    "@changesets/cli": "^3.0.3",
+    "@types/node": "26.6.5",
+    "graphql": "17.0.2",
+    "typescript": "7.0.2",
+    "vitest": "5.0.5"
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "name": "@spindlecommerce/storefront-client",
+  "version": "0.1.0",
+  "description": "A typed client for the SpindleCommerce Storefront API, for any JavaScript runtime.",
+  "keywords": [
+    "spindlecommerce",
+    "storefront"
+  ],
+  "homepage": "https://github.com/spindlecommerce/storefront-sdk/tree/main/packages/storefront-client#readme",
+  "bugs": "https://github.com/spindlecommerce/storefront-sdk/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spindlecommerce/storefront-sdk.git",
+    "directory": "packages/storefront-client"
+  },
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./schema.graphql": "./schema.graphql"
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./schema.graphql": "./schema.graphql"
+    }
+  },
+  "files": [
+    "dist",
+    "schema.graphql"
+  ],
+  "engines": {
+    "node": ">=20.9"
+  },
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json && cp ../../schema/storefront.graphql schema.graphql",
+    "typecheck": "tsc -p tsconfig.json"
+  }
+}

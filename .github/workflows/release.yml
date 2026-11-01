@@ -1,0 +1,67 @@
+name: Release
+
+# `pnpm changeset git-tag` tags each package's version, such as @spindlecommerce/storefront-client@0.2.0;
+# push the tags with `git push --tags`. Each tag's version is staged on npm with trusted publishing (no
+# token; npm records the commit and run that built it) and goes live when a maintainer approves it on
+# npmjs.com. A version already on npm, such as one staged by hand, is not staged again.
+on:
+  push:
+    tags: ["@spindlecommerce/*@*"]
+
+permissions:
+  contents: write # the GitHub release
+  id-token: write # npm trusted publishing
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - name: Find the tagged package
+        id: package
+        run: |
+          name="${GITHUB_REF_NAME%@*}"
+          version="${GITHUB_REF_NAME##*@}"
+          dir="packages/${name#@spindlecommerce/}"
+          if [ ! -f "$dir/package.json" ] || [ "$(node -p "require('./$dir/package.json').version")" != "$version" ]; then
+            echo "::error::No package in this repository has the version $GITHUB_REF_NAME"
+            exit 1
+          fi
+          { echo "name=$name"; echo "version=$version"; echo "dir=$dir"; } >> "$GITHUB_OUTPUT"
+      - uses: pnpm/action-setup@ea17c68df8912ef543352723c149a84f56e3d413 # v6.1.0
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: 24
+          cache: pnpm
+          registry-url: https://registry.npmjs.org
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+      # Staged publishing needs npm 11.15 or later.
+      - run: npm install --global npm@11.20.0
+      - name: Stage on npm
+        env:
+          NAME: ${{ steps.package.outputs.name }}
+          VERSION: ${{ steps.package.outputs.version }}
+          DIR: ${{ steps.package.outputs.dir }}
+        run: |
+          if npm view "$NAME@$VERSION" version > /dev/null 2>&1; then
+            echo "$NAME@$VERSION is already on npm"
+          else
+            # pnpm pack writes the workspace dependencies' versions and publishConfig into the tarball.
+            cd "$DIR" && pnpm pack
+            npm stage publish "$(echo "${NAME#@}" | tr / -)-$VERSION.tgz"
+            echo "::notice::Staged $NAME@$VERSION: approve it on npmjs.com, under Staged Packages"
+          fi
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          VERSION: ${{ steps.package.outputs.version }}
+          DIR: ${{ steps.package.outputs.dir }}
+        run: |
+          gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1 && exit 0
+          notes=$(awk -v heading="## $VERSION" '$0 == heading { found = 1; next } found && /^## / { exit } found' "$DIR/CHANGELOG.md" 2>/dev/null)
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" --notes "${notes:-First release.}"

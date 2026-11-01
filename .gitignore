@@ -1,0 +1,6 @@
+node_modules/
+dist/
+*.tgz
+.DS_Store
+# Copied from schema/ by the client's build
+packages/storefront-client/schema.graphql

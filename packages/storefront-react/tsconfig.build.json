@@ -1,0 +1,12 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    // Built against the client's published types, so it builds after the client.
+    "customConditions": [],
+    "noEmit": false,
+    "noEmitOnError": true,
+    "declaration": true,
+    "outDir": "dist",
+    "rootDir": "src"
+  }
+}

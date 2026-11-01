@@ -1,0 +1,75 @@
+{
+  "name": "@spindlecommerce/storefront-next",
+  "version": "0.1.0",
+  "description": "Next.js integration for SpindleCommerce storefronts: cached reads, carts in cookies, previews, visual editing and revalidation.",
+  "keywords": [
+    "spindlecommerce",
+    "storefront"
+  ],
+  "homepage": "https://github.com/spindlecommerce/storefront-sdk/tree/main/packages/storefront-next#readme",
+  "bugs": "https://github.com/spindlecommerce/storefront-sdk/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/spindlecommerce/storefront-sdk.git",
+    "directory": "packages/storefront-next"
+  },
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./client": {
+      "source": "./src/client.tsx",
+      "types": "./dist/client.d.ts",
+      "default": "./dist/client.js"
+    },
+    "./images": {
+      "source": "./src/images.ts",
+      "types": "./dist/images.d.ts",
+      "default": "./dist/images.js"
+    }
+  },
+  "publishConfig": {
+    "access": "public",
+    "exports": {
+      ".": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "./client": {
+        "types": "./dist/client.d.ts",
+        "default": "./dist/client.js"
+      },
+      "./images": {
+        "types": "./dist/images.d.ts",
+        "default": "./dist/images.js"
+      }
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "rm -rf dist && tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json"
+  },
+  "dependencies": {
+    "@spindlecommerce/storefront-client": "workspace:^",
+    "server-only": "^0.0.1"
+  },
+  "peerDependencies": {
+    "next": "^16.0.0",
+    "react": "^19.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "26.6.5",
+    "@types/react": "19.3.0",
+    "next": "16.4.1",
+    "react": "19.3.1",
+    "react-dom": "19.3.1"
+  }
+}
