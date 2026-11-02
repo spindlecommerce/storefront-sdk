@@ -1,9 +1,10 @@
 name: Release
 
-# `pnpm changeset git-tag` tags each package's version, such as @spindlecommerce/storefront-client@0.2.0;
-# push the tags with `git push --tags`. Each tag's version is staged on npm with trusted publishing (no
-# token; npm records the commit and run that built it) and goes live when a maintainer approves it on
-# npmjs.com. A version already on npm, such as one staged by hand, is not staged again.
+# `pnpm changeset git-tag` tags each package's version, such as @spindlecommerce/storefront-client@0.2.0.
+# Push each tag on its own (`git push origin <tag>`): GitHub starts no workflows for a push of more than
+# three tags. Each tag's version is staged on npm with trusted publishing (no token; npm records the
+# commit and run that built it) and goes live when a maintainer approves it on npmjs.com. A version
+# already on npm, such as one staged by hand, is not staged again.
 on:
   push:
     tags: ["@spindlecommerce/*@*"]

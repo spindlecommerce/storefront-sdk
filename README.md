@@ -60,7 +60,7 @@ Versions and changelogs come from [Changesets](https://github.com/changesets/cha
 
 1. With each change, run `pnpm changeset` and commit the file it writes.
 2. To release, run `pnpm changeset version`. It raises the versions and writes the changelogs. A package whose dependency moves out of its range is raised too. Commit and push.
-3. Run `pnpm changeset git-tag`, then `git push --tags`. For each new tag, the Release workflow tests, builds and stages that version on npm, and creates the GitHub release.
+3. Run `pnpm changeset git-tag`, then push each new tag on its own (`git push origin <tag>`): GitHub starts no workflows for a push of more than three tags. For each tag, the Release workflow tests, builds and stages that version on npm, and creates the GitHub release.
 4. Approve each staged version on npmjs.com, under **Staged Packages**, with 2FA.
 
 The workflow publishes with npm's trusted publishing, so it needs no token. A package's first version is staged by hand, the client before the packages that depend on it:
