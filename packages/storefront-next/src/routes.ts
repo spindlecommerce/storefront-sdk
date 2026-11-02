@@ -104,6 +104,30 @@ export const createDraftDisableRoute = () => {
 
 const MAX_BODY_BYTES = 1024 * 1024;
 
+/** Content-Length is only a hint; enforce the limit against the bytes actually received. */
+const readWebhookBody = async (request: Request): Promise<string | null> => {
+  if (!request.body) return "";
+  const reader = request.body.getReader();
+  const decoder = new TextDecoder();
+  let size = 0;
+  let body = "";
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) return body + decoder.decode();
+      size += value.byteLength;
+      if (size > MAX_BODY_BYTES) {
+        // A remote peer must not be able to hold the response open through cancellation.
+        void reader.cancel().catch(() => {});
+        return null;
+      }
+      body += decoder.decode(value, { stream: true });
+    }
+  } finally {
+    reader.releaseLock();
+  }
+};
+
 /** The revalidate route: platform webhooks expire the cached reads they affect. `secret` defaults to SPINDLE_REVALIDATE_SECRET. */
 export const createRevalidateRoute = (options: { secret?: string | null } = {}) =>
   async function POST(request: Request) {
@@ -111,8 +135,9 @@ export const createRevalidateRoute = (options: { secret?: string | null } = {}) 
     if (!secret) return json(503, { revalidated: false, error: "Revalidation is off: set SPINDLE_REVALIDATE_SECRET to the signing secret the admin showed for this storefront." });
     if (Number(request.headers.get("content-length") ?? 0) > MAX_BODY_BYTES) return json(413, { revalidated: false, error: "Body too large" });
 
-    // The signature covers the exact bytes sent: read the body as text and verify before parsing.
-    const body = await request.text();
+    // Decode only a bounded body, preserving UTF-8 characters split across chunks.
+    const body = await readWebhookBody(request);
+    if (body === null) return json(413, { revalidated: false, error: "Body too large" });
     if (!(await verifyWebhookSignature(secret, body, request.headers.get("x-spindle-signature")))) return json(401, { revalidated: false, error: "Invalid or expired signature" });
     const event = parseWebhookEvent(body);
     if (!event) return json(400, { revalidated: false, error: "Expected an event: { id, type, occurredAt, data }" });
